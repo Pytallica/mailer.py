@@ -8,7 +8,7 @@ import msvcrt
 
 
 with open('text.txt', 'r', encoding='utf-8') as file:
-    NAME = file.read() 
+    TEXT = file.read() # TEXT - текст письма
 
 def create_certificate(template_path, output_path, name):
 
@@ -41,27 +41,26 @@ def send_email(to_email, subject, body, attachment):
 
     with smtplib.SMTP('smtp.yandex.ru',587) as server:  # Замените на SMTP-сервер вашего почтового провайдера
         server.starttls()
-        server.login('xxxxxxxxxx', 'xxxxxxxxxxx')  # Замените на Ваши учетные данные
+        server.login('login', 'Password')  # Замените на Ваши учетные данные
         server.send_message(msg)
 
 excel_file = './xxxxxxxx.xlsx'  # Путь к Вашему файлу Excel
 df = pd.read_excel(excel_file)
 
-template_path = '123_OCR.pdf'  # Путь к Вашему шаблону сертификата
+template_path = './123_SERT.pdf'  # Путь к Вашему шаблону сертификата
 
 for index, row in df.iterrows():
     full_name = (row.iloc[0]) # Предполагаем, что имя находится в первом столбце
     
     if full_name.count(' ') == 2:
-        full_name_x = full_name.center(68) # Необходимо редактирование под свою ширину
-        
+        full_name_x = full_name.center(68) # Редактирование под свою ширину при наличии в строке имени фамилии имени и отчества
     else:
-        full_name_x = full_name.center(79) # Необходимо редактирование под свою ширину
+        full_name_x = full_name.center(79) # Редактирование под свою ширину при наличии в строке имени и фамилии
     email = row.iloc[1]     # Предполагаем, что почта находится во втором столбце
     
     certificate_filename = f"{email}certificate_{index + 1}.pdf"  # Имя файла сертификата
     create_certificate(template_path, certificate_filename, full_name_x)
-    names = f"""Уважаемый (ая) {full_name}!\n\n{NAME}""" # Необходимо редактирование под свои данные
+    names = f"""Уважаемый (ая) {full_name}!\n\n{TEXT}""" # Необходимо редактирование под свои данные
 
     send_email(email, "Сертификат хххххххххх", names, certificate_filename)
 
